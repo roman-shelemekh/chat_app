@@ -1,18 +1,20 @@
+from django.contrib.auth.hashers import make_password
 from django.db import models
-from django.contrib.auth.hashers import make_password, check_password
-from django.shortcuts import get_object_or_404
+from django.utils.text import slugify
 
 
 class RoomManager(models.Manager):
 
     def create_room(self, room_name, room_password):
         hashed_password = make_password(room_password)
-        room = self.create(room_name=room_name, room_password=hashed_password)
+        slug = slugify(room_name)
+        room = self.create(room_name=room_name, slug=slug, room_password=hashed_password)
         return room
 
 
 class RoomModel(models.Model):
     room_name = models.CharField(max_length=100, unique=True, null=False)
+    slug = models.CharField(max_length=100, unique=True, null=False)
     room_password = models.CharField(max_length=10, null=False)
     objects = RoomManager()
 

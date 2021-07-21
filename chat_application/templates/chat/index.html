@@ -2,7 +2,12 @@
 
 {% block content %}
     <div class="row min-vh-100">
-        <div class="col-4 mx-auto my-auto">
+        <div class="col-lg-5 mx-auto my-auto">
+            {% if messages %}
+            {% for message in messages %}
+            <div class="mb-5 alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
             <ul class="nav nav-tabs justify-content-center" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link {% if not create_form.errors %}active{% endif %}" id="enter-tab" data-bs-toggle="tab" data-bs-target="#enter" type="button" role="tab" aria-controls="enter" aria-selected="true">Присоединиться</button>

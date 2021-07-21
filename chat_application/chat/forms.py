@@ -70,12 +70,14 @@ class SignUpForm(ErrorClassMixin, UserCreationForm):
         fields = ("username",)
         field_classes = {'username': UsernameField}
         widgets = {
-            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Имя'}),
+            'username': forms.TextInput(attrs={'autofocus': True, 'class': 'form-control', 'placeholder': 'Имя'}),
         }
 
 
 class LoginForm(ErrorClassMixin, AuthenticationForm):
-    username = UsernameField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Имя'}))
+    username = UsernameField(
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Имя', 'autofocus': True})
+    )
     password = forms.CharField(
         label='Пароль',
         strip=False,

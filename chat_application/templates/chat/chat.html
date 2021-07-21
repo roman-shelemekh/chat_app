@@ -1,17 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Chat Room</title>
-</head>
-<body>
-    <div>
-        <textarea id="chat-log" cols="100" rows="20"></textarea>
-    </div>
-    <div>
-        <input id="chat-message-input" type="text" size="100"><br>
-        <input id="chat-message-submit" type="button" value="Send">
-    </div>
+{% extends "base.html" %}
 
-</body>
-</html>
+{% block content %}
+    <div class="row min-vh-100">
+        <div class="col-lg-8 mx-auto my-auto">
+            <h2 id="room-name" data-slug="{{ room.slug }}">{{ room.room_name }}</h2>
+            <div class="row mb-3">
+                <div class="col">
+                    <div id="message-window" class="border bg-light overflow-auto rounded" style="min-height: 350px; max-height: 350px">
+                        {% for message in room.messagemodel_set.all %}
+                        <div class="m-3">
+                            <div class="rounded-pill p-2 px-3 bg-primary text-white d-inline-block {% if message.user_name == user.username %}float-end{% endif %}">{{ message.text }}</div>
+                            <div class="clearfix"></div>
+                            <div class="d-inline-block {% if message.user_name == user.username %}float-end{% endif %}">
+                                <small><i>— <strong class="pe-2">{{ message.user_name }},</strong></i> <span class="text-muted">{{ message.timestamp}}</span></small>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-9 mb-3">
+                    <input id="message-input" class="form-control " type="text" size="20" placeholder="Введите сообщение..." autofocus data-username="{{ user.username }}">
+                </div>
+                <div class="col-lg-3">
+                    <input id="message-submit" class="w-100 btn btn-primary" type="button" value="Отправить">
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% load static %}
+{% block script %}
+<script type="module" src="{% static 'chat.js' %}"></script>
+{% endblock %}

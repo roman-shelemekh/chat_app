@@ -1,11 +1,10 @@
+from django.contrib import messages
 from django.contrib.auth import login
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
 from django.urls import reverse
-from django.utils.decorators import method_decorator
-from django.views.generic import TemplateView, FormView
+from django.views.generic import TemplateView, FormView, DetailView
 from .forms import RoomEnterForm, RoomCreateForm, SignUpForm, LoginForm
 from .models import RoomModel
 
@@ -25,14 +24,17 @@ class IndexView(TemplateView):
                 room_name = self.create_form.cleaned_data['room_name']
                 room_password = self.create_form.cleaned_data['room_password1']
                 room = RoomModel.objects.create_room(room_name, room_password)
-                return HttpResponseRedirect(reverse('chat:room', args=[room.room_name]))
+                request.session[room_name] = True
+                return HttpResponseRedirect(reverse('chat:room', args=[room.slug]))
             else:
                 self.create_form.validation_error_class()
         elif request.POST.get('button') == 'enter':
             self.enter_form = RoomEnterForm(request.POST)
             if self.enter_form.is_valid():
                 room_name = self.enter_form.cleaned_data.get('room_name')
-                return HttpResponseRedirect(reverse('chat:room', args=[room_name]))
+                room = RoomModel.objects.get(room_name=room_name)
+                request.session[room_name] = True
+                return HttpResponseRedirect(reverse('chat:room', args=[room.slug]))
             else:
                 self.enter_form.validation_error_class()
         return self.get(request, *args, **kwargs)
@@ -69,6 +71,17 @@ class MyLoginView(LoginView):
         return super(MyLoginView, self).form_invalid(form)
 
 
-@login_required
-def room(request, room_name):
-    return render(request, 'chat/chat.html', {'room_name': room_name})
+class RoomView(LoginRequiredMixin, DetailView):
+    model = RoomModel
+    context_object_name = 'room'
+    template_name = 'chat/chat.html'
+
+    def get(self, request, *args, **kwargs):
+        response = super(RoomView, self).get(request, *args, **kwargs)
+        room = self.get_object()
+        if not request.session.get(room.room_name):
+            messages.warning(request, 'К сожалению, у Вас нет доступа к этому чату. Вы можете к нему '
+                                      'присоединиться, введя нужный пароль')
+            return HttpResponseRedirect(reverse('chat:index'))
+        else:
+            return response

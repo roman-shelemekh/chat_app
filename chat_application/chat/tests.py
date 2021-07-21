@@ -15,13 +15,13 @@ class IndexViewTest(TestCase):
     def test_enter_room_not_authenticated(self):
         data = {'room_name': 'Room1', 'room_password': 'some_password_123', 'button': 'enter'}
         response = self.client.post(self.url, data, follow=True)
-        self.assertRedirects(response=response, expected_url=reverse('chat:login') + '?next=/chat/Room1/')
+        self.assertRedirects(response=response, expected_url=reverse('chat:login') + '?next=/chat/room1/')
 
     def test_enter_room_authenticated(self):
         data = {'room_name': 'Room1', 'room_password': 'some_password_123', 'button': 'enter'}
         self.client.login(username='User1', password='user_password_123')
         response = self.client.post(self.url, data, follow=True)
-        self.assertRedirects(response=response, expected_url=reverse('chat:room', args=['Room1']))
+        self.assertRedirects(response=response, expected_url=reverse('chat:room', args=['room1']))
 
     def test_enter_room_wrong_password(self):
         data = {'room_name': 'Room1', 'room_password': 'some_password_456', 'button': 'enter'}
@@ -56,7 +56,7 @@ class IndexViewTest(TestCase):
             'button': 'create'
         }
         response = self.client.post(self.url, data, follow=True)
-        self.assertRedirects(response=response, expected_url=reverse('chat:login') + '?next=/chat/Room2/')
+        self.assertRedirects(response=response, expected_url=reverse('chat:login') + '?next=/chat/room2/')
         self.assertQuerysetEqual(RoomModel.objects.all(), ['Room1', 'Room2'], ordered=False, transform=str)
 
     def test_create_new_room_authenticated(self):
@@ -68,5 +68,5 @@ class IndexViewTest(TestCase):
         }
         self.client.login(username='User1', password='user_password_123')
         response = self.client.post(self.url, data, follow=True)
-        self.assertRedirects(response=response, expected_url=reverse('chat:room', args=['Room2']))
+        self.assertRedirects(response=response, expected_url=reverse('chat:room', args=['room2']))
         self.assertQuerysetEqual(RoomModel.objects.all(), ['Room1', 'Room2'], ordered=False, transform=str)
