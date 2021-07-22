@@ -25,10 +25,13 @@ class RoomEnterForm(ErrorClassMixin, forms.Form):
 
     def clean(self):
         if self.cleaned_data.get('room_name') and self.cleaned_data.get('room_password'):
-            room = RoomModel.objects.get(room_name=self.cleaned_data['room_name'])
+            try:
+                room = RoomModel.objects.get(room_name=self.cleaned_data['room_name'])
+            except:
+                raise forms.ValidationError('Комнаты c таким названием не существует.')
             submitted_password = self.cleaned_data['room_password']
             if not check_password(submitted_password, room.room_password):
-                raise forms.ValidationError('Название комнаты или пароль введены неверно.')
+                raise forms.ValidationError('Неверный пароль.')
         return self.cleaned_data
 
 

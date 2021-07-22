@@ -75,6 +75,14 @@ TEMPLATES = [
 WSGI_APPLICATION = 'chat_application.wsgi.application'
 
 ASGI_APPLICATION = 'chat_application.asgi.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('redis', 6379)],
+        },
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -137,5 +145,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL ='/login/'
 
 LOGIN_REDIRECT_URL = '/'
+
+# DATETIME_FORMAT = '%d/%m/%Y, %H:%M'
 
 

@@ -85,3 +85,8 @@ class RoomView(LoginRequiredMixin, DetailView):
             return HttpResponseRedirect(reverse('chat:index'))
         else:
             return response
+
+    def get_context_data(self, **kwargs):
+        context = super(RoomView, self).get_context_data(**kwargs)
+        context['messages'] = self.get_object().messagemodel_set.all()[:100]
+        return context

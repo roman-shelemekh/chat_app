@@ -30,7 +30,17 @@ class IndexViewTest(TestCase):
             response=response,
             form='enter_form',
             field=None,
-            errors='Название комнаты или пароль введены неверно.'
+            errors='Неверный пароль.'
+        )
+
+    def test_enter_room_not_existing(self):
+        data = {'room_name': 'Room2', 'room_password': 'some_password_456', 'button': 'enter'}
+        response = self.client.post(self.url, data)
+        self.assertFormError(
+            response=response,
+            form='enter_form',
+            field=None,
+            errors='Комнаты c таким названием не существует.'
         )
 
     def test_create_room_same_name(self):

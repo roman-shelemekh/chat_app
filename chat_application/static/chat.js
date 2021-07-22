@@ -38,10 +38,10 @@ chatSocket.onmessage = function(event) {
 document.getElementById('message-submit').onclick = function(e) {
     const messageInput = document.getElementById('message-input')
     const message = messageInput.value
-    chatSocket.send(JSON.stringify({
+    if(message !== ''){
+        chatSocket.send(JSON.stringify({
         'message': message,
-        'user': user,
-        'room_slug': roomName
-    }));
-    messageInput.value = ''
+        }));
+        messageInput.value = ''
+    }
 }
