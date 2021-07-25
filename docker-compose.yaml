@@ -12,7 +12,19 @@ services:
       - ./.env.dev
     depends_on:
       - redis
+      - db
 
   redis:
     image: redis:6
 
+  db:
+    image: postgres:13.2
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=chat_app
+      - POSTGRES_PASSWORD=chat_app
+      - POSTGRES_DB=chat_app_dev
+
+volumes:
+  postgres_data:

@@ -15,7 +15,7 @@ class RoomManager(models.Manager):
 class RoomModel(models.Model):
     room_name = models.CharField(max_length=100, unique=True, null=False)
     slug = models.CharField(max_length=100, unique=True, null=False)
-    room_password = models.CharField(max_length=10, null=False)
+    room_password = models.CharField(max_length=100, null=False)
     objects = RoomManager()
 
     def __str__(self):

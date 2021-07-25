@@ -1,7 +1,6 @@
 import json
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
-from django.contrib.auth.models import User
 from .models import RoomModel
 
 
@@ -32,11 +31,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def create_message(self):
         room = RoomModel.objects.get(slug=self.room_name)
-        user = User.objects.get(id=self.scope['session'].load().get('_auth_user_id'))
-        msg = room.messagemodel_set.create(text=self.message, user_name=user)
+        msg = room.messagemodel_set.create(text=self.message, user_name=self.scope['user'])
         return {
             'message': msg.text,
-            'user': msg.user_name.username,
+            'user': self.scope['user'].username,
             'timestamp': msg.timestamp.strftime("%d/%m/%Y, %H:%M")
         }
 
