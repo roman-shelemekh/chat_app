@@ -4,7 +4,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from django.views.generic import TemplateView, FormView, DetailView
+from django.views.generic import TemplateView, FormView, DetailView, ListView
+from django.views.generic.detail import SingleObjectMixin
 from .forms import RoomEnterForm, RoomCreateForm, SignUpForm, LoginForm
 from .models import RoomModel
 
@@ -88,5 +89,25 @@ class RoomView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(RoomView, self).get_context_data(**kwargs)
-        context['messages'] = self.get_object().messagemodel_set.all()[:100]
+        messages = self.get_object().messagemodel_set.all().order_by('-timestamp')[:100]
+        context['messages'] = reversed(messages)
+        context['count'] = self.get_object().messagemodel_set.all().count()
+        return context
+
+
+class RoomHistoryView(SingleObjectMixin, ListView):
+    paginate_by = 50
+    template_name = 'chat/chat_history.html'
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=RoomModel.objects.all())
+        return super(RoomHistoryView, self).get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return self.object.messagemodel_set.all().order_by('-timestamp')
+
+    def get_context_data(self, **kwargs):
+        context = super(RoomHistoryView, self).get_context_data(**kwargs)
+        context['room'] = self.object
+        print(context)
         return context

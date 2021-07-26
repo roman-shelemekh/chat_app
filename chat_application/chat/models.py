@@ -1,4 +1,5 @@
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils.text import slugify
 
@@ -24,7 +25,7 @@ class RoomModel(models.Model):
 
 class MessageModel(models.Model):
     text = models.CharField(max_length=3000)
-    user_name = models.CharField(max_length=100)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
     room = models.ForeignKey(RoomModel, on_delete=models.CASCADE)
 

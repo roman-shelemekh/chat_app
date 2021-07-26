@@ -7,12 +7,18 @@
             <div class="row mb-3">
                 <div class="col">
                     <div id="message-window" class="border bg-light overflow-auto rounded" style="min-height: 350px; max-height: 350px">
+                        {% if count > 10 %}
+                        <div class="d-flex justify-content-center m-3">
+                            <a class="rounded-pill btn btn-outline-primary" href="{% url 'chat:history' room.slug %}" role="button">Вся история чата</a>
+                        </div>
+
+                        {% endif %}
                         {% for message in messages %}
                         <div class="m-3">
-                            <div class="rounded-pill p-2 px-3 bg-primary text-white d-inline-block {% if message.user_name == user.username %}float-end{% endif %}">{{ message.text }}</div>
+                            <div class="rounded-pill p-2 px-3 bg-primary text-white d-inline-block {% if message.user.username == user.username %}float-end{% endif %}">{{ message.text }}</div>
                             <div class="clearfix"></div>
-                            <div class="d-inline-block {% if message.user_name == user.username %}float-end{% endif %}">
-                                <small><i>— <strong class="pe-2">{{ message.user_name }},</strong></i> <span class="text-muted">{{ message.timestamp|date:"d/m/Y," }} {{ message.timestamp|time:"H:i" }}</span></small>
+                            <div class="d-inline-block {% if message.user.username == user.username %}float-end{% endif %}">
+                                <small><i>— <strong class="pe-2">{{ message.user.username }},</strong></i> <span class="text-muted">{{ message.timestamp|date:"d/m/Y," }} {{ message.timestamp|time:"H:i" }}</span></small>
                             </div>
                             <div class="clearfix"></div>
                         </div>
