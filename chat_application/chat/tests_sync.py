@@ -80,3 +80,29 @@ class IndexViewTest(TestCase):
         response = self.client.post(self.url, data, follow=True)
         self.assertRedirects(response=response, expected_url=reverse('chat:room', args=['room2']))
         self.assertQuerysetEqual(RoomModel.objects.all(), ['Room1', 'Room2'], ordered=False, transform=str)
+
+
+@tag('chat_sync')
+class HistoryViewTest(TestCase):
+
+    def setUp(self):
+        self.url = reverse('chat:history', args=['room1'])
+        self.room = RoomModel.objects.create_room('Room1', 'some_password_123')
+        self.user = User.objects.create_user(username='User1', password='user_password_123')
+
+    def test_get_history_page_not_authenticated(self):
+        response = self.client.get(self.url, follow=True)
+        self.assertRedirects(response=response, expected_url=reverse('chat:login') + '?next=/chat/room1/history')
+
+    def test_get_history_page_authenticated_without_permission(self):
+        self.client.login(username='User1', password='user_password_123')
+        response = self.client.get(self.url, follow=True)
+        self.assertRedirects(response=response, expected_url=reverse('chat:index'))
+
+    def test_get_history_page_authenticated_with_permission(self):
+        self.client.login(username='User1', password='user_password_123')
+        session = self.client.session
+        session[self.room.room_name] = True
+        session.save()
+        response = self.client.get(self.url, follow=True)
+        self.assertEqual(response.status_code, 200)

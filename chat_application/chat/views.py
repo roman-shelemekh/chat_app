@@ -72,20 +72,22 @@ class MyLoginView(LoginView):
         return super(MyLoginView, self).form_invalid(form)
 
 
-class RoomView(LoginRequiredMixin, DetailView):
-    model = RoomModel
-    context_object_name = 'room'
-    template_name = 'chat/chat.html'
-
+class RoomAuthMixin:
     def get(self, request, *args, **kwargs):
-        response = super(RoomView, self).get(request, *args, **kwargs)
-        room = self.get_object()
+        response = super().get(request, *args, **kwargs)
+        room = self.get_object(queryset=RoomModel.objects.all())
         if not request.session.get(room.room_name):
             messages.warning(request, 'К сожалению, у Вас нет доступа к этому чату. Вы можете к нему '
                                       'присоединиться, введя нужный пароль')
             return HttpResponseRedirect(reverse('chat:index'))
         else:
             return response
+
+
+class RoomView(RoomAuthMixin, LoginRequiredMixin, DetailView):
+    model = RoomModel
+    context_object_name = 'room'
+    template_name = 'chat/chat.html'
 
     def get_context_data(self, **kwargs):
         context = super(RoomView, self).get_context_data(**kwargs)
@@ -95,7 +97,7 @@ class RoomView(LoginRequiredMixin, DetailView):
         return context
 
 
-class RoomHistoryView(SingleObjectMixin, ListView):
+class RoomHistoryView(RoomAuthMixin, LoginRequiredMixin, SingleObjectMixin, ListView):
     paginate_by = 50
     template_name = 'chat/chat_history.html'
 
@@ -109,5 +111,4 @@ class RoomHistoryView(SingleObjectMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super(RoomHistoryView, self).get_context_data(**kwargs)
         context['room'] = self.object
-        print(context)
         return context

@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+
     <div class="row min-vh-100 mt-5" style="padding-top: 50px;">
         <div class="col-lg-8 mx-auto">
             <h2 class="mb-3">История сообщений чата {{ room.room_name }} <br>(сообщений: {{ page_obj.paginator.count }})</h2>

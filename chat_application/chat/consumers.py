@@ -33,9 +33,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def create_message(self):
         room = RoomModel.objects.get(slug=self.room_name)
         user = User.objects.get(username=self.scope['user'])
-        print(user)
         msg = room.messagemodel_set.create(text=self.message, user=user)
-        print(msg)
         return {
             'message': msg.text,
             'user': self.scope['user'].username,
