@@ -3,6 +3,9 @@
 {% block content %}
     <div class="row min-vh-100">
         <div class="col-lg-5 mx-auto my-auto">
+            {% if next %}
+                <div class="mb-5 alert alert-warning" role="alert">Пожалуйста, войдите в свой профиль, чтобы совершить это действие.</div>
+            {% endif %}
             <div class="text-center">
                 <h2 class="mb-4">Вход</h2>
             </div>
@@ -40,6 +43,10 @@
                 <button class="w-100 btn btn-lg btn-secondary" type="submit" name="button" value="create">Войти</button>
                 <input type="hidden" name="next" value="{{ next }}">
             </form>
+            <div class="text-center mt-3">
+                <small class="text-muted">Еще не зарегистрированы? <a class="ml-2" href="{% url 'chat:signup' %}">Зарегистрироваться</a></small>
+            </div>
+
         </div>
     </div>
 

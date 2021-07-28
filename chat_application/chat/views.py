@@ -1,5 +1,9 @@
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+from datetime import datetime
 from django.contrib import messages
 from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.http import HttpResponseRedirect
@@ -112,3 +116,22 @@ class RoomHistoryView(RoomAuthMixin, LoginRequiredMixin, SingleObjectMixin, List
         context = super(RoomHistoryView, self).get_context_data(**kwargs)
         context['room'] = self.object
         return context
+
+@login_required
+def send_hello_to_all_the_rooms(request):
+    rooms = RoomModel.objects.all()
+    channel_layer = get_channel_layer()
+    for room in rooms:
+        group_name = f'chat_{room.slug}'
+        print(group_name)
+        async_to_sync(channel_layer.group_send)(
+            group_name,
+            {
+                'type': 'chat_message',
+                'message': 'Привет!',
+                'user': request.user.username,
+                'timestamp': datetime.now().strftime("%d/%m/%Y, %H:%M")
+            }
+        )
+    messages.success(request, 'Вы отправили "Привет!" во все существующие комнаты!')
+    return HttpResponseRedirect(reverse('chat:index'))

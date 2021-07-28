@@ -10,5 +10,6 @@ urlpatterns = [
     path('chat/<slug:slug>/history', views.RoomHistoryView.as_view(), name='history'),
     path('signup/', views.SignupView.as_view(), name='signup'),
     path('logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
-    path('login/', views.MyLoginView.as_view(), name='login')
+    path('login/', views.MyLoginView.as_view(), name='login'),
+    path('send_hello/', views.send_hello_to_all_the_rooms, name='hello')
 ]

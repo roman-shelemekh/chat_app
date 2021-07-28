@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from django.test import TransactionTestCase, tag
+from django.test import TransactionTestCase, tag, AsyncClient
 from django.urls import re_path
 from asgiref.sync import sync_to_async
 from channels.testing import WebsocketCommunicator
@@ -83,4 +83,31 @@ class ChatTest(TransactionTestCase):
         response = await communicator2.receive_json_from()
         self.assertEqual('User1', response['user'])
         self.assertEqual('disconnect', response['event'])
+
         await communicator2.disconnect()
+
+    async def test_send_hello_to_all_rooms(self):
+        application = URLRouter([
+            re_path(r'ws/chat/(?P<room_name>\w+)/$', ChatConsumer.as_asgi()),
+        ])
+        room_slug, user1, user2 = await self.set_data()
+        # User1 connects to the chat-room
+        communicator1 = WebsocketCommunicator(application, f'/ws/chat/{room_slug}/')
+        communicator1.scope['user'] = user1
+        connected, _ = await communicator1.connect()
+        self.assertTrue(connected)
+        response = await communicator1.receive_json_from()
+        self.assertEqual('connect', response['event'])
+        self.assertEqual('User1', response['user'])
+
+        # User2 sends hello to all the rooms
+        await sync_to_async(self.async_client.login)(username='User2', password='user_password_456')
+        resp = await self.async_client.get('/send_hello/')
+        print(resp)
+
+        # User1 gets the message
+        chat_response = await communicator1.receive_json_from()
+        self.assertEqual('Привет!', chat_response['message'])
+        self.assertEqual(user2.username, chat_response['user'])
+
+        await communicator1.disconnect()
