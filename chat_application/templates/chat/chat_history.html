@@ -4,7 +4,7 @@
 
     <div class="row min-vh-100 mt-5" style="padding-top: 50px;">
         <div class="col-lg-8 mx-auto">
-            <h2 class="mb-3">История сообщений чата {{ room.room_name }} <br>(сообщений: {{ page_obj.paginator.count }})</h2>
+            <h2 class="mb-3">История сообщений чата <a href="{% url 'chat:room' room.slug %}">{{ room.room_name }}</a> <br>(сообщений: {{ page_obj.paginator.count }})</h2>
             {% for message in page_obj %}
             <div>
                 <small class="text-muted">{{ message.timestamp|date:"d/m/Y," }} {{ message.timestamp|time:"H:i" }}</small>
