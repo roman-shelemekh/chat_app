@@ -1,5 +1,5 @@
-build-image:
-	docker build -t chat_app
+start:
+	docker-compose -f docker-compose.prod.yml up --build --remove-orphans
 
-run-image:
-	docker run --rm --name chat_app -p 8080:8080 --env-file .env.dev chat_app
+stop:
+	docker-compose -f docker-compose.prod.yml down --remove-orphans -v

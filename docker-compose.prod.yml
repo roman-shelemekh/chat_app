@@ -1,0 +1,40 @@
+version: '3.9'
+
+services:
+  chat:
+    build:
+      context: ./chat_application
+      dockerfile: Dockerfile.prod
+    command: daphne -b 0.0.0.0 -p 8000 chat_application.asgi:application
+    volumes:
+      - static_volume:/home/balthasar/chat_application/staticfiles
+    expose:
+      - 8000
+    env_file:
+      - ./.env.prod
+    depends_on:
+      - redis
+      - db
+
+  redis:
+    image: redis:6
+
+  db:
+    image: postgres:13.2
+    volumes:
+    - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ./.env.prod.db
+
+  nginx:
+    build: ./nginx
+    volumes:
+      - static_volume:/home/balthasar/chat_application/staticfiles
+    ports:
+      - 1337:80
+    depends_on:
+      - chat
+
+volumes:
+  postgres_data:
+  static_volume:
