@@ -14,4 +14,11 @@ fi
 # python manage.py flush --no-input
 python manage.py migrate
 
+if [ "$DEBUG" = "0" ]
+then
+
+  python manage.py collectstatic --no-input --clear
+
+fi
+
 exec "$@"
