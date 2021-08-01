@@ -151,6 +151,4 @@ LOGIN_URL ='/login/'
 
 LOGIN_REDIRECT_URL = '/'
 
-# DATETIME_FORMAT = '%d/%m/%Y, %H:%M'
-
 
